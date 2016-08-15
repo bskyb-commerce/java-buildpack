@@ -26,8 +26,13 @@ shared_context 'application_helper' do
   previous_environment = ENV.to_hash
 
   let(:environment) do
-    { 'test-key'      => 'test-value', 'VCAP_APPLICATION' => vcap_application.to_yaml,
-      'VCAP_SERVICES' => vcap_services.to_yaml }
+    {
+      'test-key'                   => 'test-value',
+      'VCAP_APPLICATION'           => vcap_application.to_yaml,
+      'VCAP_SERVICES'              => vcap_services.to_yaml,
+      'new_relic_application_name' => 'test-application-name',
+      'new_relic_agent_enabled'    => 'true'
+    }
   end
 
   before do
@@ -47,8 +52,6 @@ shared_context 'application_helper' do
   let(:services) { application.services }
 
   let(:vcap_application) { { 'application_name' => 'test-application-name' } }
-
-  let(:vcap_application) { { 'agent_enabled' => 'true' } }
 
   let(:vcap_services) do
     { 'test-service-n/a' => [{ 'name'        => 'test-service-name', 'label' => 'test-service-n/a',
