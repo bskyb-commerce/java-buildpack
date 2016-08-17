@@ -51,17 +51,38 @@ describe JavaBuildpack::Framework::NewRelicAgent do
       expect(sandbox + 'newrelic.yml').to exist
     end
 
-    it 'updates JAVA_OPTS' do
-      allow(services).to receive(:find_service).and_return('credentials' => { 'licenseKey' => 'test-license-key' })
+    context 'when options are present' do
+      it 'updates JAVA_OPTS' do
+        allow(services).to receive(:find_service).and_return('credentials' => { 'licenseKey' => 'test-license-key' })
 
-      component.release
+        component.release
 
-      expect(java_opts).to include("-javaagent:$PWD/.java-buildpack/new_relic_agent/new_relic_agent-#{version}.jar")
-      expect(java_opts).to include('-Dnewrelic.home=$PWD/.java-buildpack/new_relic_agent')
-      expect(java_opts).to include('-Dnewrelic.config.license_key=test-license-key')
-      expect(java_opts).to include('-Dnewrelic.config.agent_enabled=true')
-      expect(java_opts).to include("-Dnewrelic.config.app_name='test-application-name'")
-      expect(java_opts).to include('-Dnewrelic.config.log_file_path=$PWD/.java-buildpack/new_relic_agent/logs')
+        expect(java_opts).to include("-javaagent:$PWD/.java-buildpack/new_relic_agent/new_relic_agent-#{version}.jar")
+        expect(java_opts).to include('-Dnewrelic.home=$PWD/.java-buildpack/new_relic_agent')
+        expect(java_opts).to include('-Dnewrelic.config.license_key=test-license-key')
+        expect(java_opts).to include('-Dnewrelic.config.agent_enabled=true')
+        expect(java_opts).to include("-Dnewrelic.config.app_name='test-application-name'")
+        expect(java_opts).to include('-Dnewrelic.config.log_file_path=$PWD/.java-buildpack/new_relic_agent/logs')
+      end
+    end
+
+    context 'when options are set to false' do
+      it 'updates JAVA_OPTS' do
+        allow(services).to receive(:find_service).and_return('credentials' => { 'licenseKey' => 'test-license-key' })
+        options = { 'new_relic_agent_enabled' => 'false' }
+        ENV.update options
+        component.release
+        expect(java_opts).to include('-Dnewrelic.config.agent_enabled=false')
+      end
+    end
+
+    context 'when options are absent' do
+      it 'updates JAVA_OPTS' do
+        allow(services).to receive(:find_service).and_return('credentials' => { 'licenseKey' => 'test-license-key' })
+        ENV.delete('new_relic_agent_enabled')
+        component.release
+        expect(java_opts).to include('-Dnewrelic.config.agent_enabled=false')
+      end
     end
 
     it 'updates JAVA_OPTS on Java 8' do
