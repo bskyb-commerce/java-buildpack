@@ -36,7 +36,7 @@ module JavaBuildpack
         @droplet.java_opts.add_javaagent(@droplet.sandbox + jar_name)
         @droplet.java_opts.add_system_property('newrelic.config.license_key', license_key)
         @droplet.java_opts.add_system_property('newrelic.home', @droplet.sandbox)
-        @droplet.java_opts.add_system_property('newrelic.config.agent_enabled', agent_enabled)
+        @droplet.java_opts.add_system_property('newrelic.environment', newrelic_env)
         @droplet.java_opts.add_system_property('newrelic.config.app_name', "'#{application_name}'")
         @droplet.java_opts.add_system_property('newrelic.config.log_file_path', logs_dir)
         @droplet.java_opts.add_system_property('newrelic.config.log_level', 'info')
@@ -56,7 +56,7 @@ module JavaBuildpack
 
       p
 
-      FILTER = /newrelic/.freeze
+      FILTER       = /newrelic/.freeze
       PROXY_FILTER = /proxy/.freeze
 
       private_constant :FILTER
@@ -71,8 +71,14 @@ module JavaBuildpack
         @application.services.find_service(FILTER)['credentials']['licenseKey']
       end
 
-      def agent_enabled
-        ENV['new_relic_agent_enabled'] == 'true' ? 'true' : 'false'
+      def newrelic_env
+        if ENV['BACKEND'] == 'prod'
+          return 'production'
+        elsif ENV['BACKEND'] == 'stage'
+          return 'staging'
+        else
+          return 'development'
+        end
       end
 
       def logs_dir

@@ -66,19 +66,24 @@ describe JavaBuildpack::Framework::NewRelicAgent do
       end
     end
 
-    it 'updates JAVA_OPTS' do
-      allow(services).to receive(:find_service).and_return('credentials' => { 'licenseKey' => 'test-license-key' })
-      options = { 'BACKEND' => 'stage' }
-      ENV.update options
+    context 'updating some of the properties' do
+      it 'updates JAVA_OPTS' do
+        allow(services).to receive(:find_service).and_return('credentials' => { 'licenseKey' => 'test-license-key' })
+        options = { 'BACKEND' => 'stage' }
+        ENV.update options
 
-      component.release
-      expect(java_opts).to include("-javaagent:$PWD/.java-buildpack/new_relic_agent/new_relic_agent-#{version}.jar")
-      expect(java_opts).to include('-Dnewrelic.home=$PWD/.java-buildpack/new_relic_agent')
-      expect(java_opts).to include('-Dnewrelic.config.license_key=test-license-key')
-      expect(java_opts).to include('-Dnewrelic.environment=staging')
-      expect(java_opts).to include("-Dnewrelic.config.app_name='test-application-name'")
-      expect(java_opts).to include('-Dnewrelic.config.log_file_path=$PWD/.java-buildpack/new_relic_agent/logs')
+        component.release
 
+        expect(java_opts).to include("-javaagent:$PWD/.java-buildpack/new_relic_agent/new_relic_agent-#{version}.jar")
+        expect(java_opts).to include('-Dnewrelic.home=$PWD/.java-buildpack/new_relic_agent')
+        expect(java_opts).to include('-Dnewrelic.config.license_key=test-license-key')
+        expect(java_opts).to include('-Dnewrelic.environment=staging')
+        expect(java_opts).to include("-Dnewrelic.config.app_name='test-application-name'")
+        expect(java_opts).to include('-Dnewrelic.config.log_file_path=$PWD/.java-buildpack/new_relic_agent/logs')
+      end
+    end
+
+    context 'update properties to have a java8 or greater as home dir' do
       it 'updates JAVA_OPTS on Java 8' do
         allow(services).to receive(:find_service).and_return('credentials' => { 'licenseKey' => 'test-license-key' })
         allow(java_home).to receive(:version).and_return(%w(1 8 0 u10))
@@ -90,5 +95,3 @@ describe JavaBuildpack::Framework::NewRelicAgent do
     end
   end
 end
-
-
