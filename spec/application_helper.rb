@@ -31,7 +31,6 @@ shared_context 'application_helper' do
       'VCAP_APPLICATION'           => vcap_application.to_yaml,
       'VCAP_SERVICES'              => vcap_services.to_yaml,
       'new_relic_application_name' => 'test-application-name',
-      'new_relic_agent_enabled'    => 'true',
       'application_name'           => 'test-application-name'
     }
   end

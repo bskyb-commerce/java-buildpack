@@ -18,8 +18,8 @@ common: &default_settings
 
   # Agent Enabled
   # Use this setting to force the agent to run or not run.
-  # Default is true.
-  agent_enabled: ''
+  # Default is false.
+  agent_enabled: false
 
   # Set to true to enable support for auto app naming.
   # The name of each web app is detected automatically
@@ -232,7 +232,21 @@ common: &default_settings
 
 development:
   <<: *default_settings
-  app_name: My Application (Development)
+    agent_enabled: false
+    attributes:
+      enabled: false
+    transaction_tracer:
+      enabled: false
+    error_collector:
+      enabled: false
+    transaction_events:
+      enabled: false
+    cross_application_tracer:
+      enabled: false
+    thread_profiler:
+      enabled: false
+    browser_monitoring:
+      auto_instrument: false
 
 test:
   <<: *default_settings
@@ -240,7 +254,22 @@ test:
 
 production:
   <<: *default_settings
+  agent_enabled: true
 
 staging:
   <<: *default_settings
-  app_name: My Application (Staging)
+  agent_enabled: false
+  attributes:
+    enabled: false
+  transaction_tracer:
+    enabled: false
+  error_collector:
+    enabled: false
+  transaction_events:
+    enabled: false
+  cross_application_tracer:
+    enabled: false
+  thread_profiler:
+    enabled: false
+  browser_monitoring:
+    auto_instrument: false
