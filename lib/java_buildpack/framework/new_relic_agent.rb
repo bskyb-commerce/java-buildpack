@@ -56,7 +56,7 @@ module JavaBuildpack
 
       p
 
-      FILTER = /newrelic/.freeze
+      FILTER       = /newrelic/.freeze
       PROXY_FILTER = /proxy/.freeze
 
       private_constant :FILTER
@@ -71,8 +71,14 @@ module JavaBuildpack
         @application.services.find_service(FILTER)['credentials']['licenseKey']
       end
 
-      def agent_enabled
-        ENV['new_relic_agent_enabled'] == 'true' ? 'true' : 'false'
+      def newrelic_env
+        if ENV['BACKEND'] == 'prod'
+          return 'production'
+        elsif ENV['BACKEND'] == 'stage'
+          return 'staging'
+        else
+          return 'development'
+        end
       end
 
       def logs_dir
