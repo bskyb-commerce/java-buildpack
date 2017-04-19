@@ -46,10 +46,12 @@ module JavaBuildpack
         port java_opts, credentials
         ssl_enabled java_opts, credentials
         
-        proxy_host java_opts, proxy_credentials
-        proxy_port java_opts, proxy_credentials
-        proxy_user java_opts, proxy_credentials
-        proxy_password_file java_opts, proxy_credentials
+        if proxy_credentials
+          proxy_host java_opts, proxy_credentials
+          proxy_port java_opts, proxy_credentials
+          proxy_user java_opts, proxy_credentials
+          proxy_password_file java_opts, proxy_credentials
+        end
       end
 
       protected
