@@ -117,22 +117,22 @@ module JavaBuildpack
       end
 
       def proxy_host(java_opts, proxy_credentials)
-        host = @proxy_credentials['host']
+        host = proxy_credentials['host']
         java_opts.add_system_property('appdynamics.http.proxyHost', host.to_s) if !host.nil?
       end
 
       def proxy_user(java_opts, proxy_credentials)
-        user = @proxy_credentials['user']
+        user = proxy_credentials['user']
         java_opts.add_system_property('appdynamics.http.proxyHost', user.to_s) if !user.nil?
       end
 
       def proxy_password(java_opts, proxy_credentials)
-        password = @proxy_credentials['password']
+        password = proxy_credentials['password']
         java_opts.add_system_property('appdynamics.http.proxyHost', password.to_s) if !password.nil?
       end
 
       def proxy_port(java_opts, proxy_credentials)
-        port = @proxy_credentials['port']
+        port = proxy_credentials['port']
         java_opts.add_system_property('appdynamics.http.proxyHost', port.to_s) if !port.nil?
       end
 
