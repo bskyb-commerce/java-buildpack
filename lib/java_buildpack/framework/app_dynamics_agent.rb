@@ -62,8 +62,10 @@ module JavaBuildpack
       private
 
       FILTER = /app[-]?dynamics/
-
+      PROXY_FILTER = /proxy/
+      
       private_constant :FILTER
+      private_constant :PROXY_FILTER
 
       def application_name(java_opts, credentials)
         name = credentials['application-name'] || @configuration['default_application_name'] ||
