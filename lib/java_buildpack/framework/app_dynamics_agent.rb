@@ -33,6 +33,7 @@ module JavaBuildpack
       # (see JavaBuildpack::Component::BaseComponent#release)
       def release
         credentials = @application.services.find_service(FILTER)['credentials']
+        proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
         java_opts   = @droplet.java_opts
         java_opts.add_javaagent(@droplet.sandbox + 'javaagent.jar')
 
@@ -45,10 +46,10 @@ module JavaBuildpack
         port java_opts, credentials
         ssl_enabled java_opts, credentials
         
-        @droplet.java_opts.add_system_property('appdynamics.http.proxyHost', '$WEB_PROXY_HOST') if !proxy_host.nil? && !proxy_host.empty?
-        @droplet.java_opts.add_system_property('appdynamics.http.proxyUser', '$WEB_PROXY_USER') if !proxy_user.nil? && !proxy_user.empty?
-        @droplet.java_opts.add_system_property('appdynamics.http.proxyPort', '$WEB_PROXY_PORT') if !proxy_port.nil?
-        @droplet.java_opts.add_system_property('appdynamics.http.proxyPassword', '$WEB_PROXY_PASS') if !proxy_password.nil? && !proxy_password.empty?
+        proxy_host java_opts, proxy_credentials
+        proxy_port java_opts, proxy_credentials
+        proxy_user java_opts, proxy_credentials
+        proxy_password_file java_opts, proxy_credentials
       end
 
       protected
@@ -109,22 +110,33 @@ module JavaBuildpack
         java_opts.add_system_property('appdynamics.agent.tierName', name.to_s)
       end
 
-      def proxy_host
-        @application.services.find_service(PROXY_FILTER)['credentials']['host']
+      def proxy_host(java_opts, proxy_credentials)
+        host = proxy_credentials['host']
+        java_opts.add_system_property 'appdynamics.http.proxyHost', host if host
       end
 
-      def proxy_user
-        @application.services.find_service(PROXY_FILTER)['credentials']['username']
+      def proxy_user(java_opts, proxy_credentials)
+        user = proxy_credentials['username']
+        java_opts.add_system_property 'appdynamics.http.proxyUser', user if user
       end
 
-      def proxy_password
-        @application.services.find_service(PROXY_FILTER)['credentials']['password']
+      def proxy_port(java_opts, proxy_credentials)
+        port = proxy_credentials['port']
+        java_opts.add_system_property 'appdynamics.http.proxyPort', port if port
       end
 
-      def proxy_port
-        @application.services.find_service(PROXY_FILTER)['credentials']['port']
+      def proxy_password_file(java_opts, proxy_credentials)
+        password = proxy_credentials['password']
+        # needs to be a file.
+        if password
+          proxyFile = @droplet.sandbox + 'proxyPass.txt'
+          FileUtils.mkdir_p proxyFile.parent
+
+          File.write(proxyFile, password)
+
+          java_opts.add_system_property 'appdynamics.http.proxyPasswordFile', proxyFile
+        end
       end
     end
-
   end
 end
