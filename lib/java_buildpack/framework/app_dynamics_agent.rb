@@ -33,7 +33,6 @@ module JavaBuildpack
       # (see JavaBuildpack::Component::BaseComponent#release)
       def release
         credentials = @application.services.find_service(FILTER)['credentials']
-        # proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
         java_opts   = @droplet.java_opts
         java_opts.add_javaagent(@droplet.sandbox + 'javaagent.jar')
 
@@ -46,6 +45,10 @@ module JavaBuildpack
         port java_opts, credentials
         ssl_enabled java_opts, credentials
         
+        @droplet.java_opts.add_system_property('appdynamics.http.proxyHost', '$WEB_PROXY_HOST') if !proxy_host.nil? && !proxy_host.empty?
+        @droplet.java_opts.add_system_property('appdynamics.http.proxyUser', '$WEB_PROXY_USER') if !proxy_user.nil? && !proxy_user.empty?
+        @droplet.java_opts.add_system_property('appdynamics.http.proxyPort', '$WEB_PROXY_PORT') if !proxy_port.nil?
+        @droplet.java_opts.add_system_property('appdynamics.http.proxyPassword', '$WEB_PROXY_PASS') if !proxy_password.nil? && !proxy_password.empty?
       end
 
       protected
@@ -104,6 +107,22 @@ module JavaBuildpack
         name = credentials['tier-name'] || @configuration['default_tier_name'] ||
           @application.details['application_name']
         java_opts.add_system_property('appdynamics.agent.tierName', name.to_s)
+      end
+
+      def proxy_host
+        @application.services.find_service(PROXY_FILTER)['credentials']['host']
+      end
+
+      def proxy_user
+        @application.services.find_service(PROXY_FILTER)['credentials']['username']
+      end
+
+      def proxy_password
+        @application.services.find_service(PROXY_FILTER)['credentials']['password']
+      end
+
+      def proxy_port
+        @application.services.find_service(PROXY_FILTER)['credentials']['port']
       end
     end
 
