@@ -15,8 +15,8 @@
 
 # Configuration for the AppDynamics framework
 ---
-version: 4.2.15_2
-repository_root: "https://packages.appdynamics.com/java"
+version: 4.2.7_1
+repository_root: "https://s3-eu-west-1.amazonaws.com/shop-pipeline/appd"
 default_application_name: $(ruby -e "require 'json' ; a = JSON.parse(ENV['VCAP_APPLICATION']);
   puts \"#{a['space_name']}:#{a['application_name']}\"")
 default_node_name: $(ruby -e "require 'json' ; a = JSON.parse(ENV['VCAP_APPLICATION']);
