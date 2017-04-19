@@ -44,6 +44,7 @@ module JavaBuildpack
         host_name java_opts, credentials
         port java_opts, credentials
         ssl_enabled java_opts, credentials
+        set_logs_dir java_opts
         
         java_opts.add_system_property('appdynamics.http.proxyHost', '$WEB_PROXY_HOST') if !proxy_host.nil? && !proxy_host.empty?
         java_opts.add_system_property('appdynamics.http.proxyUser', '$WEB_PROXY_USER') if !proxy_user.nil? && !proxy_user.empty?
@@ -108,6 +109,10 @@ module JavaBuildpack
         name = credentials['tier-name'] || @configuration['default_tier_name'] ||
           @application.details['application_name']
         java_opts.add_system_property('appdynamics.agent.tierName', name.to_s)
+      end
+
+      def set_logs_dir(java_opts)
+        java_opts.add_system_property('appdynamics.agent.logs.dir ', @droplet.sandbox + 'logs')
       end
 
       def proxy_host
