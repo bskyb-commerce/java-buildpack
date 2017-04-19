@@ -33,6 +33,7 @@ module JavaBuildpack
       # (see JavaBuildpack::Component::BaseComponent#release)
       def release
         credentials = @application.services.find_service(FILTER)['credentials']
+        proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
         java_opts   = @droplet.java_opts
         java_opts.add_javaagent(@droplet.sandbox + 'javaagent.jar')
 
@@ -44,13 +45,13 @@ module JavaBuildpack
         host_name java_opts, credentials
         port java_opts, credentials
         ssl_enabled java_opts, credentials
-        set_logs_dir java_opts
         
-        java_opts.add_system_property('appdynamics.http.proxyHost', '$WEB_PROXY_HOST') if !proxy_host.nil? && !proxy_host.empty?
-        java_opts.add_system_property('appdynamics.http.proxyUser', '$WEB_PROXY_USER') if !proxy_user.nil? && !proxy_user.empty?
-        java_opts.add_system_property('appdynamics.http.proxyPassword', '$WEB_PROXY_PASS') if !proxy_password.nil? && !proxy_password.empty?
-        java_opts.add_system_property('appdynamics.http.proxyPort', '$WEB_PROXY_PORT') if !proxy_port.nil?
+        proxy_host java_opts, proxy_credentials
+        proxy_port java_opts, proxy_credentials
+        proxy_user java_opts, proxy_credentials
+        proxy_password java_opts, proxy_credentials
 
+        set_logs_dir java_opts
       end
 
       protected
@@ -115,20 +116,24 @@ module JavaBuildpack
         java_opts.add_system_property('appdynamics.agent.logs.dir ', @droplet.sandbox + 'logs')
       end
 
-      def proxy_host
-        @application.services.find_service(PROXY_FILTER)['credentials']['host']
+      def proxy_host(java_opts, proxy_credentials)
+        host = @proxy_credentials['host']
+        java_opts.add_system_property('appdynamics.http.proxyHost', host.to_s) if !host.nil?
       end
 
-      def proxy_user
-        @application.services.find_service(PROXY_FILTER)['credentials']['username']
+      def proxy_user(java_opts, proxy_credentials)
+        user = @proxy_credentials['user']
+        java_opts.add_system_property('appdynamics.http.proxyHost', user.to_s) if !user.nil?
       end
 
-      def proxy_password
-        @application.services.find_service(PROXY_FILTER)['credentials']['password']
+      def proxy_password(java_opts, proxy_credentials)
+        password = @proxy_credentials['password']
+        java_opts.add_system_property('appdynamics.http.proxyHost', password.to_s) if !password.nil?
       end
 
-      def proxy_port
-        @application.services.find_service(PROXY_FILTER)['credentials']['port']
+      def proxy_port(java_opts, proxy_credentials)
+        port = @proxy_credentials['port']
+        java_opts.add_system_property('appdynamics.http.proxyHost', port.to_s) if !port.nil?
       end
 
     end
