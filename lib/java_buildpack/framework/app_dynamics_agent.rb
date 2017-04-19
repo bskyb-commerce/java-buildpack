@@ -58,7 +58,9 @@ module JavaBuildpack
 
       # (see JavaBuildpack::Component::VersionedDependencyComponent#supports?)
       def supports?
-        @application.services.one_service? FILTER, 'host-name'
+        found = @application.services.one_service? FILTER, 'host-name'
+        puts "Checking AppD Support: " + fount.to_s
+        found
       end
 
       private
