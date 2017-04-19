@@ -33,7 +33,7 @@ module JavaBuildpack
       # (see JavaBuildpack::Component::BaseComponent#release)
       def release
         credentials = @application.services.find_service(FILTER)['credentials']
-        proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
+        # proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
         java_opts   = @droplet.java_opts
         java_opts.add_javaagent(@droplet.sandbox + 'javaagent.jar')
 
@@ -46,7 +46,6 @@ module JavaBuildpack
         port java_opts, credentials
         ssl_enabled java_opts, credentials
         
-        set_logs_dir java_opts
       end
 
       protected
@@ -106,11 +105,6 @@ module JavaBuildpack
           @application.details['application_name']
         java_opts.add_system_property('appdynamics.agent.tierName', name.to_s)
       end
-
-      def set_logs_dir(java_opts)
-        java_opts.add_system_property('appdynamics.agent.logs.dir ', @droplet.sandbox + 'logs')
-      end
-
     end
 
   end
