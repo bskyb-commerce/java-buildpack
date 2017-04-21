@@ -33,7 +33,6 @@ module JavaBuildpack
       # (see JavaBuildpack::Component::BaseComponent#release)
       def release
         credentials = @application.services.find_service(FILTER)['credentials']
-        proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
         java_opts   = @droplet.java_opts
         java_opts.add_javaagent(@droplet.sandbox + 'javaagent.jar')
 
@@ -46,7 +45,8 @@ module JavaBuildpack
         port java_opts, credentials
         ssl_enabled java_opts, credentials
 
-        if !proxy_credentials.nil? && !proxy_credentials.empty?
+        if !@application.services.find_service(FILTER).nil?
+          proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
           proxy_host java_opts, proxy_credentials
           proxy_port java_opts, proxy_credentials
           proxy_user java_opts, proxy_credentials
