@@ -45,7 +45,7 @@ module JavaBuildpack
         port java_opts, credentials
         ssl_enabled java_opts, credentials
 
-        if !@application.services.find_service(FILTER).nil?
+        if !@application.services.find_service(PROXY_FILTER).nil?
           proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
           proxy_host java_opts, proxy_credentials
           proxy_port java_opts, proxy_credentials
