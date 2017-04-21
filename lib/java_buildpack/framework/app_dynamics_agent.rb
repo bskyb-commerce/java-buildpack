@@ -45,8 +45,8 @@ module JavaBuildpack
         host_name java_opts, credentials
         port java_opts, credentials
         ssl_enabled java_opts, credentials
-        
-        if proxy_credentials
+
+        if !proxy_credentials.nil? && !proxy_credentials.empty?
           proxy_host java_opts, proxy_credentials
           proxy_port java_opts, proxy_credentials
           proxy_user java_opts, proxy_credentials
@@ -65,7 +65,7 @@ module JavaBuildpack
 
       FILTER = /app[-]?dynamics/
       PROXY_FILTER = /proxy/
-      
+
       private_constant :FILTER
       private_constant :PROXY_FILTER
 
