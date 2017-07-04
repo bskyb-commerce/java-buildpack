@@ -57,7 +57,7 @@ module JavaBuildpack
 
         # Do Event Notification if we have API Credentials.
         if !@application.services.find_service(API_FILTER).nil?
-          deployment_notifier @application.services.find_service(API_FILTER)['credentials'] credentials
+          deployment_notifier @application.services.find_service(API_FILTER)['credentials'], credentials
         end
       end
 
