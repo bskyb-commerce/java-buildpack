@@ -15,6 +15,8 @@
 # limitations under the License.
 
 require 'fileutils'
+require 'net/http'
+require 'uri'
 require 'java_buildpack/component/versioned_dependency_component'
 require 'java_buildpack/framework'
 
@@ -44,6 +46,7 @@ module JavaBuildpack
         host_name java_opts, credentials
         port java_opts, credentials
         ssl_enabled java_opts, credentials
+        deployment_notifier credentials
 
         if !@application.services.find_service(PROXY_FILTER).nil?
           proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
@@ -68,7 +71,35 @@ module JavaBuildpack
 
       private_constant :FILTER
       private_constant :PROXY_FILTER
+      
+      # If api-user api-name are set on credenitals and appd-build set in env.
+      # tell appd about this release.
+      def deployment_notifier(credentials)
+        
+        if credentials['api-user'] and credentials ['api-password']
+            api_auth = credentials['api-auth']
+            host_name = credentials['host-name']
+            tier_name = credentials['tier-name'] || @configuration['default_tier_name'] || @application.details['application_name']
+            summary = "Deployed Build ID: ${BUILD_ID}"
+            comment = "Comment"
 
+            events_uri = URI.parse("https://$host_name:$port/$app_name/events")
+            request = Net::HTTP::Post.new(events_uri.path)
+            request.basic_auth "credentials['api-user']@credentials['account-name']", credentials['api-password']
+            request.set_form_data({
+              'eventtype' => 'APPLICATION_DEPLOYMENT',
+              'summary' => "Deployed: $app_name",
+              'severity' => "INFO"
+            })
+            
+            sock = Net::HTTP.new(events_uri.host, events_uri.port)
+            sock.use_ssl = true
+            res = sock.start { |http| http.request(req) }
+            
+            # Debug LOG.
+        end
+      end
+      
       def application_name(java_opts, credentials)
         name = credentials['application-name'] || @configuration['default_application_name'] ||
           @application.details['application_name']
