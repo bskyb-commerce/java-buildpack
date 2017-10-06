@@ -22,3 +22,8 @@
 jre:
   version: 9.0.+
   repository_root: "https://s3-eu-west-1.amazonaws.com/shop-pipeline"
+memory_calculator:
+  version: 3.+
+  repository_root: "{default.repository.root}/memory-calculator/{platform}/{architecture}"
+  class_count: 
+  stack_threads: 300
