@@ -68,8 +68,12 @@ module JavaBuildpack
         end
       end
 
+      def jre9_cacerts?
+        Pathname.new(@droplet.java_home.root + 'lib/security/cacerts')
+      end
+
       def cacerts
-        if Pathname.new(@droplet.java_home.root + 'lib/security/cacerts').exist?
+        if jre9_cacerts.exist?
           @droplet.java_home.root + 'lib/security/cacerts'
         else
           @droplet.java_home.root + 'jre/lib/security/cacerts'

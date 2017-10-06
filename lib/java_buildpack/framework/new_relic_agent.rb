@@ -37,13 +37,9 @@ module JavaBuildpack
         @droplet.java_opts.add_system_property('newrelic.home', @droplet.sandbox)
         @droplet.java_opts.add_system_property('newrelic.config.license_key', license_key)
         @droplet.java_opts.add_system_property('newrelic.config.app_name', application_name)
-        @droplet.java_opts.add_system_property('newrelic.config.log_file_path', logs_dir)
-        @droplet.java_opts.add_system_property('newrelic.config.log_level', 'info')
-        @droplet.java_opts.add_system_property('newrelic.enable.java.8', 'true') if @droplet.java_home.version[1] == '8'
-        @droplet.java_opts.add_system_property('newrelic.config.proxy_host', '$WEB_PROXY_HOST') if !proxy_host.nil? && !proxy_host.empty?
-        @droplet.java_opts.add_system_property('newrelic.config.proxy_user', '$WEB_PROXY_USER') if !proxy_user.nil? && !proxy_user.empty?
-        @droplet.java_opts.add_system_property('newrelic.config.proxy_password', '$WEB_PROXY_PASS') if !proxy_password.nil? && !proxy_password.empty?
-        @droplet.java_opts.add_system_property('newrelic.config.proxy_port', '$WEB_PROXY_PORT') if !proxy_port.nil?
+        set_config_opts
+        set_proxy_host
+        set_proxy_user
       end
 
       protected
@@ -53,13 +49,29 @@ module JavaBuildpack
         @application.services.one_service? FILTER, 'licenseKey'
       end
 
-      p
+      private
 
       FILTER = /newrelic/
       PROXY_FILTER = /proxy/
-      
+
       private_constant :FILTER
       private_constant :PROXY_FILTER
+
+      def set_config_opts
+        @droplet.java_opts.add_system_property('newrelic.config.log_file_path', logs_dir)
+        @droplet.java_opts.add_system_property('newrelic.config.log_level', 'info')
+        @droplet.java_opts.add_system_property('newrelic.enable.java.8', 'true') if @droplet.java_home.version[1] == '8'
+      end
+
+      def set_proxy_host
+        @droplet.java_opts.add_system_property('newrelic.config.proxy_user', '$WEB_PROXY_USER') if !proxy_user.nil? && !proxy_user.empty?
+        @droplet.java_opts.add_system_property('newrelic.config.proxy_password', '$WEB_PROXY_PASS') if !proxy_password.nil? && !proxy_password.empty?
+      end
+
+      def set_proxy_user
+        @droplet.java_opts.add_system_property('newrelic.config.proxy_host', '$WEB_PROXY_HOST') if !proxy_host.nil? && !proxy_host.empty?
+        @droplet.java_opts.add_system_property('newrelic.config.proxy_port', '$WEB_PROXY_PORT') unless proxy_port.nil?
+      end
 
       def application_name
         # @application.details['new_relic_application_name']
@@ -72,14 +84,15 @@ module JavaBuildpack
 
       def newrelic_env
         if ENV['BACKEND'] == 'prod'
-          return 'production'
+          'production'
         elsif ENV['BACKEND'] == 'stage'
-          return 'staging'
+          'staging'
         else
-          return 'development'
+          'development'
         end
       end
 
+      # Sets default log directory for agent.
       def logs_dir
         @droplet.sandbox + 'logs'
       end
@@ -111,8 +124,6 @@ module JavaBuildpack
       def proxy_port
         @application.services.find_service(PROXY_FILTER)['credentials']['port']
       end
-
     end
-
   end
 end

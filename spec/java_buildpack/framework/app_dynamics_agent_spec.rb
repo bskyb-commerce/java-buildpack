@@ -143,9 +143,8 @@ describe JavaBuildpack::Framework::AppDynamicsAgent do
         end
       end
 
-
       context do
-        let(:proxy_credentials) { { 'host' => 'test-proxy-host'} }
+        let(:proxy_credentials) { { 'host' => 'test-proxy-host' } }
 
         it 'adds proxyHost to JAVA_OPTS if specified' do
           component.release
@@ -163,7 +162,7 @@ describe JavaBuildpack::Framework::AppDynamicsAgent do
           expect(java_opts).to include('-Dappdynamics.http.proxyUser=test-proxy-user')
         end
       end
-      
+
       context do
         let(:proxy_credentials) { super().merge 'password' => 'test-proxy-pass' }
 
@@ -174,7 +173,7 @@ describe JavaBuildpack::Framework::AppDynamicsAgent do
         end
       end
 
-    context do
+      context do
         let(:proxy_credentials) { super().merge 'port' => '3184' }
 
         it 'adds proxyPort to JAVA_OPTS if specified' do
@@ -183,9 +182,6 @@ describe JavaBuildpack::Framework::AppDynamicsAgent do
           expect(java_opts).to include('-Dappdynamics.http.proxyPort=3184')
         end
       end
-
     end
-
   end
-
 end

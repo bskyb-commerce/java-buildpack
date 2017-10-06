@@ -22,7 +22,8 @@ describe JavaBuildpack::Framework::ContainerCertificateTrustStore do
   include_context 'component_helper'
 
   let(:ca_certificates) { Pathname.new('spec/fixtures/ca-certificates.crt') }
-
+  let(:jre9_cacerts) { Pathname.new('spec/fixtures/cacerts') }
+  let(:jre8_cacerts) { Pathname.new('spec/fixtures/cacerts8') }
   let(:configuration) { { 'enabled' => true } }
 
   it 'detects with ca-certificates file' do
@@ -41,10 +42,29 @@ describe JavaBuildpack::Framework::ContainerCertificateTrustStore do
     end
   end
 
+  it 'creates truststore for legacy JRE',
+     cache_fixture: 'stub-container-customizer.jar' do
+
+    allow(component).to receive(:ca_certificates).and_return(ca_certificates)
+    allow(component).to receive(:jre9_cacerts).and_return(jre8_cacerts)
+
+    allow(component).to receive(:shell).with("#{java_home.root}/bin/java -jar " \
+                                             "#{sandbox}/container_certificate_trust_store-0.0.0.jar " \
+                                             "--container-source #{ca_certificates} " \
+                                             "--destination #{sandbox}/truststore.jks " \
+                                             '--destination-password java-buildpack-trust-store-password ' \
+                                             "--jre-source #{java_home.root}/jre/lib/security/cacerts " \
+                                             '--jre-source-password changeit')
+
+    component.compile
+  end
+
   it 'creates truststore',
      cache_fixture: 'stub-container-customizer.jar' do
 
     allow(component).to receive(:ca_certificates).and_return(ca_certificates)
+    allow(component).to receive(:jre9_cacerts).and_return(jre9_cacerts)
+
     allow(component).to receive(:shell).with("#{java_home.root}/bin/java -jar " \
                                              "#{sandbox}/container_certificate_trust_store-0.0.0.jar " \
                                              "--container-source #{ca_certificates} " \

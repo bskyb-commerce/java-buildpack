@@ -92,7 +92,6 @@ describe JavaBuildpack::Container::TomcatGemfireStore do
       expect(component.detect).to be
     end
 
-    # rubocop:disable Metrics/LineLength
     it 'returns command' do
       expect(component.command).to eq(%w(test-opt-2
                                          test-opt-1

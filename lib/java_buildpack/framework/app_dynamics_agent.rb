@@ -45,13 +45,7 @@ module JavaBuildpack
         port java_opts, credentials
         ssl_enabled java_opts, credentials
 
-        if !@application.services.find_service(PROXY_FILTER).nil?
-          proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
-          proxy_host java_opts, proxy_credentials
-          proxy_port java_opts, proxy_credentials
-          proxy_user java_opts, proxy_credentials
-          proxy_password_file java_opts, proxy_credentials
-        end
+        configure_proxy java_opts
       end
 
       protected
@@ -68,6 +62,15 @@ module JavaBuildpack
 
       private_constant :FILTER
       private_constant :PROXY_FILTER
+
+      def configure_proxy(java_opts)
+        return if @application.services.find_service(PROXY_FILTER).nil?
+        proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
+        proxy_host java_opts, proxy_credentials
+        proxy_port java_opts, proxy_credentials
+        proxy_user java_opts, proxy_credentials
+        proxy_password_file java_opts, proxy_credentials
+      end
 
       def application_name(java_opts, credentials)
         name = credentials['application-name'] || @configuration['default_application_name'] ||
@@ -130,14 +133,11 @@ module JavaBuildpack
       def proxy_password_file(java_opts, proxy_credentials)
         password = proxy_credentials['password']
         # needs to be a file.
-        if password
-          proxyFile = @droplet.sandbox + 'proxyPass.txt'
-          FileUtils.mkdir_p proxyFile.parent
-
-          File.write(proxyFile, password)
-
-          java_opts.add_system_property 'appdynamics.http.proxyPasswordFile', proxyFile
-        end
+        return unless password
+        proxy_file = @droplet.sandbox + 'proxyPass.txt'
+        FileUtils.mkdir_p proxy_file.parent
+        File.write(proxy_file, password)
+        java_opts.add_system_property 'appdynamics.http.proxyPasswordFile', proxy_file
       end
     end
   end
