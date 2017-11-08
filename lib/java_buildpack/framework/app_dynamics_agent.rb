@@ -105,7 +105,7 @@ module JavaBuildpack
             
             events_uri.query = URI.encode_www_form(
             'eventtype' => 'APPLICATION_DEPLOYMENT',
-            'summary' => URI.encode("Deploying: #{app_name}"),
+            'summary' => "Deploying: #{app_name} into #{appd_name}",
             'severity' => 'INFO'
             )
               
