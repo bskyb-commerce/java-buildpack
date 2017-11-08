@@ -66,7 +66,7 @@ module JavaBuildpack
         @logger.debug("-----> Trying AppD Deployment Notification.")
         # Do Event Notification if we have API Credentials.
         if !@application.services.find_service(API_FILTER).nil?
-          deployment_notifier @application.services.find_service(API_FILTER)['credentials'], credentials
+          deployment_notifier @application.services.find_service(API_FILTER)['credentials'], credentials, proxy_credentials
         end
       end
 
@@ -89,9 +89,8 @@ module JavaBuildpack
       
       # If api-user api-name are set on credenitals and appd-build set in env.
       # tell appd about this release.
-      def deployment_notifier(api_credentials, credentials)
+      def deployment_notifier(api_credentials, credentials, proxy_credentials)
         @logger.debug("-----> Trying AppD Deployment Notification.")
-        @logger.debug(api_credentials)
         if api_credentials['username'] and api_credentials['password']
             @logger.debug("----> Making Request");
             host_name = credentials['host-name']
@@ -102,6 +101,7 @@ module JavaBuildpack
             account = credentials['account-name']
             
             events_uri = URI.parse("#{protocol}://#{host_name}:#{port}/#{app_name}/events")
+
             request = Net::HTTP::Post.new(events_uri.path)
             request.basic_auth "#{api_user}@#{account}", api_credentials['password']
             request.set_form_data({
@@ -110,12 +110,17 @@ module JavaBuildpack
               'severity' => 'INFO'
             })
 
-            @logger.debug(request)
-
-            sock = Net::HTTP.new(events_uri.host, events_uri.port)
-            sock.use_ssl = true
-            res = sock.start { |http| http.request(request) }
-            
+            if proxy_credentials
+              @logger.debug("Using Proxy to call AppD API.")
+              proxy = Net::HTTP::Proxy(proxy_credentials['host'], proxy_credentials['port'], proxy_credentials['user'], proxy_credentials['password'])
+              res = proxy.start(events_uri.host, events_uri.port) do |http|
+                http.request(request)
+              end
+            else
+              sock = Net::HTTP.new(events_uri.host, events_uri.port)
+              sock.use_ssl = true
+              res = sock.start { |http| http.request(request) }
+            end
         end
       end
       
