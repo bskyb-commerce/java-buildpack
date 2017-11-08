@@ -19,14 +19,21 @@ require 'net/http'
 require 'uri'
 require 'java_buildpack/component/versioned_dependency_component'
 require 'java_buildpack/framework'
-require 'java_buildpack/logging/logger_factory'
+require 'java_buildpack/logging/logger_factory'g
 
 module JavaBuildpack
   module Framework
 
     # Encapsulates the functionality for enabling zero-touch AppDynamics support.
     class AppDynamicsAgent < JavaBuildpack::Component::VersionedDependencyComponent
-
+      # Creates an instance
+      #
+      # @param [Hash] context a collection of utilities used the component
+      def initialize(context)
+        super(context)
+        @logger = JavaBuildpack::Logging::LoggerFactory.instance.get_logger AppDynamicsAgent
+      end
+      
       # (see JavaBuildpack::Component::BaseComponent#compile)
       def compile
         download_zip(false, @droplet.sandbox, 'AppDynamics Agent')
@@ -55,6 +62,7 @@ module JavaBuildpack
           proxy_user java_opts, proxy_credentials
           proxy_password_file java_opts, proxy_credentials
         end
+        
         @logger.debug("-----> Trying AppD Deployment Notification.")
         # Do Event Notification if we have API Credentials.
         if !@application.services.find_service(API_FILTER).nil?
