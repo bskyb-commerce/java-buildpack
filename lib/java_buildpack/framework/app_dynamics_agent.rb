@@ -96,7 +96,7 @@ module JavaBuildpack
             host_name = credentials['host-name']
             port = credentials['port']
             app_name = credentials['application-name'] || @configuration['default_application_name'] || @application.details['application_name']
-            protocol = (credentials['ssl-enabled']) ? 'https' : 'http';
+            protocol = 'https';
             api_user = api_credentials['username']
             account = credentials['account-name']
             
