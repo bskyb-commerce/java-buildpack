@@ -101,14 +101,13 @@ module JavaBuildpack
             account = credentials['account-name']
             
             events_uri = URI.parse("#{protocol}://#{host_name}:#{port}/controller/rest/applications/#{app_name}/events")
-
+            
+            events_uri.query = URI.encode_www_form(['eventtype', 'APPLICATION_DEPLOYMENT'],
+              ['summary', "Deploying: #{app_name}",
+              ['severity', 'INFO'])
+              
             request = Net::HTTP::Post.new(events_uri.path)
             request.basic_auth "#{api_user}@#{account}", api_credentials['password']
-            request.set_form_data({
-              'eventtype' => 'APPLICATION_DEPLOYMENT',
-              'summary' => "Deploying: #{app_name}",
-              'severity' => 'INFO'
-            })
 
             if !@application.services.find_service(PROXY_FILTER).nil?
               @logger.debug("Using Proxy to call AppD API.")
