@@ -109,7 +109,7 @@ module JavaBuildpack
             'severity' => 'INFO'
             )
               
-            request = Net::HTTP::Post.new(events_uri.path)
+            request = Net::HTTP::Post.new(events_uri.request_uri)
             request.basic_auth "#{api_user}@#{account}", api_credentials['password']
 
             if !@application.services.find_service(PROXY_FILTER).nil?
