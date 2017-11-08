@@ -100,7 +100,7 @@ module JavaBuildpack
             api_user = api_credentials['username']
             account = credentials['account-name']
             
-            events_uri = URI.parse("#{protocol}://#{host_name}:#{port}/#{app_name}/events")
+            events_uri = URI.parse("#{protocol}://#{host_name}:#{port}/controller/rest/applications/#{app_name}/events")
 
             request = Net::HTTP::Post.new(events_uri.path)
             request.basic_auth "#{api_user}@#{account}", api_credentials['password']
@@ -117,7 +117,7 @@ module JavaBuildpack
               res = proxy.start(events_uri.host, events_uri.port) do |http|
                 http.request(request)
               end
-              @logger.debug(res.body)
+              @logger.debug(res.body)g
             else
               sock = Net::HTTP.new(events_uri.host, events_uri.port)
               sock.use_ssl = true
