@@ -114,10 +114,12 @@ module JavaBuildpack
               @logger.debug("Using Proxy to call AppD API.")
               proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
               @logger.debug(proxy_credentials)
+              @logger.debug("Requesting> #{events_uri}")
               proxy = Net::HTTP::Proxy(proxy_credentials['host'], proxy_credentials['port'], proxy_credentials['username'], proxy_credentials['password'])
               res = proxy.start(events_uri.host, events_uri.port, :use_ssl => events_uri.scheme == 'https') do |http|
                 http.request(request)
               end
+              @logger.debug(res.code)
               @logger.debug(res.body)
             else
               sock = Net::HTTP.new(events_uri.host, events_uri.port)
