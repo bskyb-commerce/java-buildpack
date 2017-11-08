@@ -95,7 +95,7 @@ module JavaBuildpack
             @logger.debug("----> Making Request");
             host_name = credentials['host-name']
             port = credentials['port']
-            appd_name = credentials['app-name']
+            appd_name = credentials['application-name']
             app_name = credentials['tier-name'] || @configuration['default_application_name'] || @application.details['application_name']
             protocol = 'https';
             api_user = api_credentials['username']
