@@ -103,7 +103,7 @@ module JavaBuildpack
             events_uri = URI.parse("#{protocol}://#{host_name}:#{port}/controller/rest/applications/#{app_name}/events")
             
             events_uri.query = URI.encode_www_form(['eventtype', 'APPLICATION_DEPLOYMENT'],
-              ['summary', "Deploying: #{app_name}",
+              ['summary', "Deploying: #{app_name}"],
               ['severity', 'INFO'])
               
             request = Net::HTTP::Post.new(events_uri.path)
