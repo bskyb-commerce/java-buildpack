@@ -91,6 +91,7 @@ module JavaBuildpack
       # tell appd about this release.
       def deployment_notifier(api_credentials, credentials)
         @logger.debug("-----> Trying AppD Deployment Notification.")
+        @logger.debug(api_credentials)
         if api_credentials['username'] and api_credentials['password']
             @logger.debug("----> Making Request");
             host_name = credentials['host-name']
