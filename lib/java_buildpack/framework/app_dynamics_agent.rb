@@ -95,12 +95,13 @@ module JavaBuildpack
             @logger.debug("----> Making Request");
             host_name = credentials['host-name']
             port = credentials['port']
+            appd_name = credentials['app-name']
             app_name = credentials['tier-name'] || @configuration['default_application_name'] || @application.details['application_name']
             protocol = 'https';
             api_user = api_credentials['username']
             account = credentials['account-name']
             
-            events_uri = URI.parse("#{protocol}://#{host_name}:#{port}/controller/rest/applications/#{app_name}/events")
+            events_uri = URI.parse("#{protocol}://#{host_name}:#{port}/controller/rest/applications/#{appd_name}/events")
             
             events_uri.query = URI.encode_www_form(
             'eventtype' => 'APPLICATION_DEPLOYMENT',
