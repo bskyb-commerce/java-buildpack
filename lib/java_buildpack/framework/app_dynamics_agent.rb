@@ -110,16 +110,10 @@ module JavaBuildpack
               'severity' => 'INFO'
             })
 
-            if !proxy_credentials.nil?
-              @logger.debug("Using Proxy to call AppD API.")
-              proxy = Net::HTTP::Proxy(proxy_credentials['host'], proxy_credentials['port'], proxy_credentials['user'], proxy_credentials['password'])
-              res = proxy.start(events_uri.host, events_uri.port) do |http|
-                http.request(request)
-              end
-            else
-              sock = Net::HTTP.new(events_uri.host, events_uri.port)
-              sock.use_ssl = true
-              res = sock.start { |http| http.request(request) }
+            @logger.debug("Using Proxy to call AppD API.")
+            proxy = Net::HTTP::Proxy(proxy_credentials['host'], proxy_credentials['port'], proxy_credentials['user'], proxy_credentials['password'])
+            res = proxy.start(events_uri.host, events_uri.port) do |http|
+              http.request(request)
             end
         end
       end
