@@ -57,6 +57,7 @@ module JavaBuildpack
 
         # Do Event Notification if we have API Credentials.
         if !@application.services.find_service(API_FILTER).nil?
+          print "----> Found AppD API Credentials.";
           deployment_notifier @application.services.find_service(API_FILTER)['credentials'], credentials
         end
       end
@@ -81,7 +82,7 @@ module JavaBuildpack
       # If api-user api-name are set on credenitals and appd-build set in env.
       # tell appd about this release.
       def deployment_notifier(api_credentials, credentials)
-        
+        print "----> Notifying AppD Of Deployment."
         if api_credentials['username'] and api_credentials['password']
             host_name = credentials['host-name']
             port = credentials['port']
