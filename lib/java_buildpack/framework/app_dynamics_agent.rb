@@ -92,6 +92,7 @@ module JavaBuildpack
       def deployment_notifier(api_credentials, credentials)
         @logger.debug("-----> Trying AppD Deployment Notification.")
         if api_credentials['username'] and api_credentials['password']
+            @logger.debug("----> Making Request");
             host_name = credentials['host-name']
             port = credentials['port']
             app_name = credentials['application-name'] || @configuration['default_application_name'] || @application.details['application_name']
@@ -107,7 +108,9 @@ module JavaBuildpack
               'summary' => "Deploying: #{app_name}",
               'severity' => 'INFO'
             })
-            
+
+            @logger.debug(request)
+
             sock = Net::HTTP.new(events_uri.host, events_uri.port)
             sock.use_ssl = true
             res = sock.start { |http| http.request(request) }
