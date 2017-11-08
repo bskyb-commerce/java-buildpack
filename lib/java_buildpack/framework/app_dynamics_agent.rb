@@ -95,7 +95,7 @@ module JavaBuildpack
             @logger.debug("----> Making Request");
             host_name = credentials['host-name']
             port = credentials['port']
-            app_name = credentials['application-name'] || @configuration['default_application_name'] || @application.details['application_name']
+            app_name = credentials['tier-name'] || @configuration['default_application_name'] || @application.details['application_name']
             protocol = 'https';
             api_user = api_credentials['username']
             account = credentials['account-name']
@@ -104,7 +104,7 @@ module JavaBuildpack
             
             events_uri.query = URI.encode_www_form(
             'eventtype' => 'APPLICATION_DEPLOYMENT',
-            'summary' => "Deploying: #{app_name}",
+            'summary' => URI.encode("Deploying: #{app_name}"),
             'severity' => 'INFO'
             )
               
