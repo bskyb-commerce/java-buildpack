@@ -117,7 +117,7 @@ module JavaBuildpack
               res = proxy.start(events_uri.host, events_uri.port) do |http|
                 http.request(request)
               end
-              @logger.debug(res.body)g
+              @logger.debug(res.body)
             else
               sock = Net::HTTP.new(events_uri.host, events_uri.port)
               sock.use_ssl = true
