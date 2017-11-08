@@ -66,7 +66,8 @@ module JavaBuildpack
         @logger.debug("-----> Trying AppD Deployment Notification.")
         # Do Event Notification if we have API Credentials.
         if !@application.services.find_service(API_FILTER).nil?
-          deployment_notifier @application.services.find_service(API_FILTER)['credentials'], credentials, @application.services.find_service(PROXY_FILTER)['credentials']
+          proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
+          deployment_notifier @application.services.find_service(API_FILTER)['credentials'], credentials, proxy_credentials
         end
       end
 
@@ -110,7 +111,7 @@ module JavaBuildpack
               'severity' => 'INFO'
             })
 
-            if proxy_credentials
+            if !proxy_credentials
               @logger.debug("Using Proxy to call AppD API.")
               proxy = Net::HTTP::Proxy(proxy_credentials['host'], proxy_credentials['port'], proxy_credentials['user'], proxy_credentials['password'])
               res = proxy.start(events_uri.host, events_uri.port) do |http|
