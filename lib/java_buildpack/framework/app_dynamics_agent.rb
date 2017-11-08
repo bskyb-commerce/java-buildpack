@@ -19,6 +19,7 @@ require 'net/http'
 require 'uri'
 require 'java_buildpack/component/versioned_dependency_component'
 require 'java_buildpack/framework'
+require 'java_buildpack/logging/logger_factory'
 
 module JavaBuildpack
   module Framework
