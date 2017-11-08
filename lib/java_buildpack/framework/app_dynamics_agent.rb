@@ -114,6 +114,7 @@ module JavaBuildpack
               @logger.debug("Using Proxy to call AppD API.")
               proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
               proxy = Net::HTTP::Proxy(proxy_credentials['host'], proxy_credentials['port'], proxy_credentials['user'], proxy_credentials['password'])
+              proxy.use_ssl = true
               res = proxy.start(events_uri.host, events_uri.port) do |http|
                 http.request(request)
               end
