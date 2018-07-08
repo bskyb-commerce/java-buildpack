@@ -95,35 +95,6 @@ describe JavaBuildpack::Container::TomcatInstance do
     expect(root_webapp + '.test-file').not_to exist
   end
 
-=begin
-  context do
-    let(:configuration) { { 'context_path' => '/first-segment/second-segment' } }
-
-    it 'links only the application files and directories to the first-segment#second-segment webapp',
-       app_fixture:   'container_tomcat_with_index',
-       cache_fixture: 'stub-tomcat.tar.gz' do
-
-      FileUtils.touch(app_dir + '.test-file')
-
-      component.compile
-
-      root_webapp = app_dir + '.java-buildpack/tomcat/webapps/first-segment#second-segment'
-
-      web_inf = root_webapp + 'WEB-INF'
-      expect(web_inf).to exist
-      expect(web_inf).to be_symlink
-      expect(web_inf.readlink).to eq((app_dir + 'WEB-INF').relative_path_from(root_webapp))
-
-      index = root_webapp + 'index.html'
-      expect(index).to exist
-      expect(index).to be_symlink
-      expect(index.readlink).to eq((app_dir + 'index.html').relative_path_from(root_webapp))
-
-      expect(root_webapp + '.test-file').not_to exist
-    end
-  end
-=end
-
   it 'links the Tomcat datasource JAR to the ROOT webapp when that JAR is present',
      app_fixture:   'container_tomcat',
      cache_fixture: 'stub-tomcat7.tar.gz' do
@@ -155,15 +126,15 @@ describe JavaBuildpack::Container::TomcatInstance do
 
     web_inf_lib = app_dir + 'WEB-INF/lib'
 
-    test_jar_1 = web_inf_lib + 'test-jar-1.jar'
-    test_jar_2 = web_inf_lib + 'test-jar-2.jar'
-    expect(test_jar_1).to exist
-    expect(test_jar_1).to be_symlink
-    expect(test_jar_1.readlink).to eq((additional_libs_directory + 'test-jar-1.jar').relative_path_from(web_inf_lib))
+    test_jar1 = web_inf_lib + 'test-jar-1.jar'
+    test_jar2 = web_inf_lib + 'test-jar-2.jar'
+    expect(test_jar1).to exist
+    expect(test_jar1).to be_symlink
+    expect(test_jar1.readlink).to eq((additional_libs_directory + 'test-jar-1.jar').relative_path_from(web_inf_lib))
 
-    expect(test_jar_2).to exist
-    expect(test_jar_2).to be_symlink
-    expect(test_jar_2.readlink).to eq((additional_libs_directory + 'test-jar-2.jar').relative_path_from(web_inf_lib))
+    expect(test_jar2).to exist
+    expect(test_jar2).to be_symlink
+    expect(test_jar2.readlink).to eq((additional_libs_directory + 'test-jar-2.jar').relative_path_from(web_inf_lib))
   end
 
 end

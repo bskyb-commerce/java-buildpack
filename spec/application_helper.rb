@@ -30,8 +30,7 @@ shared_context 'application_helper' do
       'VCAP_APPLICATION'                        => vcap_application.to_json,
       'VCAP_SERVICES'                           => vcap_services.to_json,
       'BACKEND'                                 => 'development',
-      'new_relic_application_name'              => 'test-application-name'
-    }
+      'new_relic_application_name'              => 'test-application-name' }
   end
 
   before do

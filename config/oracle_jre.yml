@@ -23,22 +23,7 @@ jre:
   version: 1.8.0_16+
   repository_root: "https://s3-eu-west-1.amazonaws.com/shop-pipeline"
 memory_calculator:
-  version: 2.+
+  version: 3.+
   repository_root: "{default.repository.root}/memory-calculator/{platform}/{architecture}"
+  class_count: 
   stack_threads: 300
-  memory_sizes:
-    heap: 
-    metaspace: 128m..
-    native: 
-    permgen: 128m..
-    stack: 228k..
-  memory_heuristics:
-    heap: 65
-    metaspace: 10
-    native: 15
-    permgen: 10
-    stack: 10
-  memory_initials:
-    heap: 100%
-    metaspace: 100%
-    permgen: 100%
