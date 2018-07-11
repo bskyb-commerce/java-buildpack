@@ -1,3 +1,4 @@
+.appdynamics.com
 .newrelic.com
 .sky.com
 .bskyb.com

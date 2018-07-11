@@ -15,15 +15,25 @@
 # limitations under the License.
 
 require 'fileutils'
+require 'net/http'
+require 'uri'
 require 'java_buildpack/component/versioned_dependency_component'
 require 'java_buildpack/framework'
+require 'java_buildpack/logging/logger_factory'
 
 module JavaBuildpack
   module Framework
 
     # Encapsulates the functionality for enabling zero-touch AppDynamics support.
     class AppDynamicsAgent < JavaBuildpack::Component::VersionedDependencyComponent
-
+      # Creates an instance
+      #
+      # @param [Hash] context a collection of utilities used the component
+      def initialize(context)
+        super(context)
+        @logger = JavaBuildpack::Logging::LoggerFactory.instance.get_logger AppDynamicsAgent
+      end
+      
       # (see JavaBuildpack::Component::BaseComponent#compile)
       def compile
         download_zip(false, @droplet.sandbox, 'AppDynamics Agent')
@@ -52,6 +62,12 @@ module JavaBuildpack
           proxy_user java_opts, proxy_credentials
           proxy_password_file java_opts, proxy_credentials
         end
+        
+        @logger.debug("-----> Looking for API credentials.")
+        # Do Event Notification if we have API Credentials.
+        if !@application.services.find_service(API_FILTER).nil?
+          deployment_notifier @application.services.find_service(API_FILTER)['credentials'], credentials
+        end
       end
 
       protected
@@ -63,12 +79,58 @@ module JavaBuildpack
 
       private
 
+      API_FILTER = /appd-api/
       FILTER = /app[-]?dynamics/
       PROXY_FILTER = /proxy/
 
       private_constant :FILTER
       private_constant :PROXY_FILTER
+      private_constant :API_FILTER
+      
+      # If api-user api-name are set on credenitals and appd-build set in env.
+      # tell appd about this release.
+      def deployment_notifier(api_credentials, credentials)
+        @logger.debug("-----> Trying AppD Deployment Notification.")
+        if api_credentials['username'] and api_credentials['password']
+            @logger.debug("----> Making Request");
+            host_name = credentials['host-name']
+            port = credentials['port']
+            appd_name = credentials['application-name']
+            app_name = credentials['tier-name'] || @configuration['default_application_name'] || @application.details['application_name']
+            protocol = 'https';
+            api_user = api_credentials['username']
+            account = credentials['account-name']
+            
+            events_uri = URI.parse("#{protocol}://#{host_name}:#{port}/controller/rest/applications/#{appd_name}/events")
+            
+            events_uri.query = URI.encode_www_form(
+            'eventtype' => 'APPLICATION_DEPLOYMENT',
+            'summary' => "Deploying: #{app_name} into #{appd_name}",
+            'severity' => 'INFO'
+            )
+              
+            request = Net::HTTP::Post.new(events_uri.request_uri)
+            request.basic_auth "#{api_user}@#{account}", api_credentials['password']
 
+            if !@application.services.find_service(PROXY_FILTER).nil?
+              @logger.debug("Using Proxy to call AppD API.")
+              proxy_credentials = @application.services.find_service(PROXY_FILTER)['credentials']
+              @logger.debug(proxy_credentials)
+              @logger.debug("Requesting> #{events_uri}")
+              proxy = Net::HTTP::Proxy(proxy_credentials['host'], proxy_credentials['port'], proxy_credentials['username'], proxy_credentials['password'])
+              res = proxy.start(events_uri.host, events_uri.port, :use_ssl => events_uri.scheme == 'https') do |http|
+                http.request(request)
+              end
+              @logger.debug(res.code)
+              @logger.debug(res.body)
+            else
+              sock = Net::HTTP.new(events_uri.host, events_uri.port)
+              sock.use_ssl = true
+              res = sock.start { |http| http.request(request) }
+            end
+        end
+      end
+      
       def application_name(java_opts, credentials)
         name = credentials['application-name'] || @configuration['default_application_name'] ||
           @application.details['application_name']
